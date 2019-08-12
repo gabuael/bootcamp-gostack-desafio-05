@@ -117,3 +117,27 @@ export const Option = styled.button.attrs({
     background: ${props => props.colorPress};
   }
 `;
+
+export const ChangePage = styled.button`
+  padding: 8px;
+  margin: 10px;
+  border-radius: 8px;
+  border: 1px solid #7159c1;
+  background: #fff;
+  align-items: center;
+  justify-content: center;
+
+  &:active {
+    background: #b0a2dd;
+  }
+
+  &[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+`;
+
+export const OptionsPage = styled.div`
+  display: flex;
+  flex-direction: row;
+`;

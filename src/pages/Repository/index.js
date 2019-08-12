@@ -1,10 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { api } from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList, Option } from './styles';
+import {
+  Loading,
+  Owner,
+  IssueList,
+  Option,
+  ChangePage,
+  OptionsPage,
+} from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -19,10 +27,12 @@ export default class Repository extends Component {
     repository: {},
     issues: [],
     loading: true,
+    page: 1,
   };
 
   async componentDidMount() {
     const { match } = this.props;
+    const { page } = this.state;
     const repoName = decodeURIComponent(match.params.repository);
 
     const [repositoy, issues] = await Promise.all([
@@ -31,6 +41,7 @@ export default class Repository extends Component {
         params: {
           state: 'all',
           per_page: 5,
+          page,
         },
       }),
     ]);
@@ -43,18 +54,38 @@ export default class Repository extends Component {
   }
 
   handleFilter = async filter => {
-    const { repository } = this.state;
+    const { repository, page } = this.state;
     const issues = await api.get(`/repos/${repository.full_name}/issues`, {
       params: {
         state: filter,
         per_page: 5,
+        page,
       },
     });
     this.setState({ issues: issues.data });
   };
 
+  handlePage = async direction => {
+    const { page: pageState, repository, filter } = this.state;
+    let page = pageState;
+    if (direction === 'left') {
+      page--;
+    } else {
+      page++;
+    }
+    const issues = await api.get(`/repos/${repository.full_name}/issues`, {
+      params: {
+        state: filter,
+        per_page: 5,
+        page,
+      },
+    });
+
+    this.setState({ issues: issues.data, page });
+  };
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, page } = this.state;
 
     if (loading) {
       return <Loading>Carregando</Loading>;
@@ -104,6 +135,17 @@ export default class Repository extends Component {
               </div>
             </li>
           ))}
+          <OptionsPage>
+            <ChangePage
+              disabled={page === 1}
+              onClick={() => this.handlePage('left')}
+            >
+              <FaChevronLeft color="#7159c1" size={18} />
+            </ChangePage>
+            <ChangePage onClick={() => this.handlePage('right')}>
+              <FaChevronRight color="#7159c1" size={18} />
+            </ChangePage>
+          </OptionsPage>
         </IssueList>
       </Container>
     );
