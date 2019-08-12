@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, IssueList, Option } from './styles';
 
 export default class Repository extends Component {
   static propTypes = {
@@ -29,7 +29,7 @@ export default class Repository extends Component {
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: 'open',
+          state: 'all',
           per_page: 5,
         },
       }),
@@ -41,6 +41,17 @@ export default class Repository extends Component {
       loading: false,
     });
   }
+
+  handleFilter = async filter => {
+    const { repository } = this.state;
+    const issues = await api.get(`/repos/${repository.full_name}/issues`, {
+      params: {
+        state: filter,
+        per_page: 5,
+      },
+    });
+    this.setState({ issues: issues.data });
+  };
 
   render() {
     const { repository, issues, loading } = this.state;
@@ -58,6 +69,27 @@ export default class Repository extends Component {
           <p>{repository.description}</p>
         </Owner>
         <IssueList>
+          <Option
+            color="blue"
+            colorPress="#0000cc"
+            onClick={() => this.handleFilter('all')}
+          >
+            All
+          </Option>
+          <Option
+            color="#00cc00"
+            colorPress="green"
+            onClick={() => this.handleFilter('open')}
+          >
+            Open
+          </Option>
+          <Option
+            color="red"
+            colorPress="#cc0000"
+            onClick={() => this.handleFilter('closed')}
+          >
+            Closed
+          </Option>
           {issues.map(issue => (
             <li key={String(issue.id)}>
               <img src={issue.user.avatar_url} alt={issue.user.login} />

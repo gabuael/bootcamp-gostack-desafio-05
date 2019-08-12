@@ -100,3 +100,20 @@ export const IssueList = styled.ul`
     }
   }
 `;
+
+export const Option = styled.button.attrs({
+  type: 'button',
+})`
+  padding: 10px;
+  margin: 10px;
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 8px;
+  background: ${props => props.color};
+  color: #fff;
+  border: 0;
+
+  &:active {
+    background: ${props => props.colorPress};
+  }
+`;
