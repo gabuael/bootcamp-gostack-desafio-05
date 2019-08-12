@@ -17,7 +17,6 @@ export default class Main extends Component {
 
   componentDidMount() {
     const repositories = localStorage.getItem('repositories');
-
     if (repositories) {
       this.setState({ repositories: JSON.parse(repositories) });
     }
@@ -43,6 +42,10 @@ export default class Main extends Component {
     const { newRepo, repositories } = this.state;
 
     try {
+      if (repositories.find(repository => repository.name === newRepo)) {
+        throw new Error('Repositório duplicado');
+      }
+
       const response = await api.get(`/repos/${newRepo}`);
 
       const data = {
